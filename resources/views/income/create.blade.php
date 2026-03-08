@@ -3,41 +3,18 @@
 
 @section('content')
 
-  <style>
-    :root {
-      --card-light: rgba(255, 255, 255, 0.75);
-      --card-dark: rgba(30, 41, 59, 0.7);
-    }
-
-    body.dark-mode {
-      background: #0f172a;
-      color: #f1f5f9;
-    }
-
-    .glass-card {
-      backdrop-filter: blur(14px);
-      background: var(--card-light);
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    body.dark-mode .glass-card {
-      background: var(--card-dark);
-    }
-
-    .btn-modern {
-      border-radius: 50px;
-      padding: 8px 28px;
-      background: linear-gradient(90deg, #10b981, #059669);
-      border: none;
-      color: #fff;
-    }
-  </style>
-
   <div class="container py-5">
 
-    <h4 class="fw-bold mb-4">💰 เพิ่มรายรับ</h4>
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
+      <h4 class="fw-bold mb-0">💰 เพิ่มรายรับ</h4>
+
+      <a href="{{ route('income.index') }}" class="btn btn-outline-secondary">
+        ← ย้อนกลับ
+      </a>
+
+    </div>
+    
     @if ($errors->any())
       <div class="alert alert-danger">
         <ul class="mb-0">
@@ -96,9 +73,9 @@
         </div>
 
         <div class="d-flex justify-content-end">
-          <a href="{{ route('income.index') }}" class="btn btn-secondary mr-2">
+          {{-- <a href="{{ route('income.index') }}" class="btn btn-secondary mr-2">
             ยกเลิก
-          </a>
+          </a> --}}
 
           <button class="btn btn-modern">
             บันทึกรายรับ

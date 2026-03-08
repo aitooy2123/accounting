@@ -1,35 +1,80 @@
 @extends('layouts.app')
-@section('title', 'Create User')
 
-@section('css')
-@endsection
+@section('title','เพิ่มผู้ใช้งาน')
 
 @section('content')
 
-  <h2>Create User</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="mb-0 font-weight-bold text-primary">👤 เพิ่มผู้ใช้งาน</h3>
+        <small class="text-muted">Create User</small>
+    </div>
 
-  <form action="{{ route('users.store') }}" method="POST">
+    <a href="{{ route('users.index') }}" class="btn btn-secondary">
+        กลับ
+    </a>
+</div>
 
-    @csrf
+<div class="card card-modern border-0 shadow-sm">
+    <div class="card-body">
 
-    <label>Name</label>
-    <br>
-    <input type="text" name="name">
+        <form action="{{ route('users.store') }}" method="POST">
+            @csrf
 
-    <br><br>
+            <div class="form-group">
+                <label>ชื่อผู้ใช้งาน</label>
+                <input 
+                    type="text" 
+                    name="name"
+                    value="{{ old('name') }}"
+                    class="form-control @error('name') is-invalid @enderror"
+                >
 
-    <label>Email</label>
-    <br>
-    <input type="email" name="email">
+                @error('name')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
 
-    <br><br>
+            <div class="form-group">
+                <label>Email</label>
+                <input 
+                    type="email" 
+                    name="email"
+                    value="{{ old('email') }}"
+                    class="form-control @error('email') is-invalid @enderror"
+                >
 
-    <button type="submit">Save</button>
+                @error('email')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
 
-  </form>
+            <div class="form-group">
+                <label>Password</label>
+                <input 
+                    type="password" 
+                    name="password"
+                    class="form-control @error('password') is-invalid @enderror"
+                >
 
-  <br>
+                @error('password')
+                    <div class="invalid-feedback">
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
 
-  <a href="{{ route('user.index') }}">Back</a>
+            <button class="btn btn-primary mt-3">
+                บันทึกข้อมูล
+            </button>
+
+        </form>
+
+    </div>
+</div>
 
 @endsection

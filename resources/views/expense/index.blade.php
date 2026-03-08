@@ -9,7 +9,7 @@
       <small class="text-muted">Expense Management</small>
     </div>
 
-    <a href="{{ route('expense.create') }}" class="btn btn-primary btn-modern shadow-sm">
+    <a href="{{ route('expense.create') }}" class="btn btn-primary btn-modern2 shadow-sm">
       + เพิ่มรายจ่าย
     </a>
   </div>
@@ -65,7 +65,7 @@
                   {{ $row->description }}
                 </td>
 
-                <td class="align-middle text-center pr-4">
+                <td class="align-middle text-nowrap text-center pr-4">
 
                   <a href="{{ route('expense.edit', $row->id) }}" class="btn btn-sm btn-outline-warning mr-1">
                     แก้ไข

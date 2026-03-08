@@ -3,101 +3,69 @@
 
 @section('content')
 
-  <style>
-    :root {
-      --bg-light: #f1f5f9;
-      --bg-dark: #0f172a;
-      --card-light: rgba(255, 255, 255, 0.75);
-      --card-dark: rgba(30, 41, 59, 0.7);
-    }
-
-    body.dark-mode {
-      background: var(--bg-dark);
-      color: #f1f5f9;
-    }
-
-    .glass-card {
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      background: var(--card-light);
-      border-radius: 20px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      transition: all .3s ease;
-    }
-
-    body.dark-mode .glass-card {
-      background: var(--card-dark);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .input-modern {
-      border-radius: 12px;
-      transition: .2s;
-    }
-
-    .input-modern:focus {
-      border-color: #6366f1;
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, .2);
-    }
-
-    .btn-modern {
-      border-radius: 50px;
-      padding: 8px 28px;
-      background: linear-gradient(90deg, #3b82f6, #6366f1);
-      border: none;
-      transition: .3s;
-      color: #fff;
-    }
-
-    .btn-modern:hover {
-      transform: scale(1.05);
-      box-shadow: 0 10px 20px rgba(99, 102, 241, .3);
-    }
-  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/css/bootstrap-datepicker.min.css">
 
   <div class="container py-5">
 
-    <h4 class="fw-bold mb-4">💰 เพิ่มรายรับ</h4>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h4 class="fw-bold mb-0">💰 เพิ่มรายรับ</h4>
+
+      <a href="{{ route('expense.index') }}" class="btn btn-outline-secondary">
+        ← ย้อนกลับ
+      </a>
+    </div>
 
     <div class="glass-card p-4">
 
-      <form method="POST" action="{{ route('income.store') }}" onsubmit="disableBtn()">
+      <form method="POST" action="{{ route('expense.store') }}" onsubmit="return prepareAmount()">
         @csrf
 
         <div class="mb-3">
           <label>วันที่</label>
-          <input type="date" name="date" class="form-control input-modern" value="{{ old('date') }}" required autofocus>
+
+          <input type="text" id="date" name="date" class="form-control @error('date') is-invalid @enderror" placeholder="เลือกวันที่" value="{{ old('date') }}" required>
+
           @error('date')
-            <small class="text-danger">{{ $message }}</small>
+            <div class="invalid-feedback">
+              {{ $message }}
+            </div>
           @enderror
+
         </div>
 
         <div class="mb-3">
-          <label>หมวดหมู่</label>
-          <select name="category_id" class="form-control input-modern" required>
-            <option value="">-- เลือกหมวดหมู่ --</option>
-            @foreach ($categories as $cat)
-              <option value="{{ $cat->id }}" {{ old('category_id') == $cat->id ? 'selected' : '' }}>
-                {{ $cat->name }}
-              </option>
-            @endforeach
-          </select>
-        </div>
 
-        <div class="mb-3">
           <label>จำนวนเงิน</label>
-          <input type="text" id="amount" name="amount" class="form-control input-modern" value="{{ old('amount') }}" required>
+
+          <input type="text" id="amount" name="amount" class="form-control @error('amount') is-invalid @enderror" placeholder="เช่น 1,500" value="{{ old('amount') }}" required>
+
           @error('amount')
-            <small class="text-danger">{{ $message }}</small>
+            <div class="invalid-feedback">
+              {{ $message }}
+            </div>
           @enderror
+
+          <small class="text-success" id="amount_text"></small>
+
         </div>
 
         <div class="mb-4">
+
           <label>รายละเอียด</label>
-          <input type="text" name="description" class="form-control input-modern" value="{{ old('description') }}">
+
+          <textarea name="description" rows="3" class="form-control @error('description') is-invalid @enderror" placeholder="เช่น รายรับจากการขายสินค้า">{{ old('description') }}</textarea>
+
+          @error('description')
+            <div class="invalid-feedback">
+              {{ $message }}
+            </div>
+          @enderror
+
         </div>
 
-        <button id="submitBtn" class="btn btn-modern">
+        <input type="hidden" name="category_id" value="2">
+
+        <button id="submitBtn" class="btn btn-primary">
           บันทึกข้อมูล
         </button>
 
@@ -106,21 +74,93 @@
     </div>
   </div>
 
-  <script>
-    // ป้องกันกดซ้ำ
-    function disableBtn() {
-      document.getElementById('submitBtn').disabled = true;
-    }
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    // format เงิน realtime
-    document.getElementById('amount').addEventListener('input', function(e) {
-      let value = e.target.value.replace(/,/g, '');
-      if (!isNaN(value) && value !== '') {
-        e.target.value = Number(value).toLocaleString('en-US');
-      }
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/js/bootstrap-datepicker.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/locales/bootstrap-datepicker.th.min.js"></script>
+
+  <script>
+    // Datepicker TH
+    $('#date').datepicker({
+      format: 'dd/mm/yyyy',
+      language: 'th',
+      thaiyear: true,
+      autoclose: true,
+      todayHighlight: true
     });
 
-    // dark mode load
+
+    // format เงิน
+    const amountInput = document.getElementById('amount');
+    const textBox = document.getElementById('amount_text');
+
+    amountInput.addEventListener('input', function(e) {
+
+      let value = e.target.value.replace(/,/g, '');
+
+      if (!isNaN(value) && value !== '') {
+        e.target.value = Number(value).toLocaleString('en-US');
+        textBox.innerText = numberToThaiText(value);
+      } else {
+        textBox.innerText = '';
+      }
+
+    });
+
+
+    // ลบ comma ก่อน submit
+    function prepareAmount() {
+
+      let input = document.getElementById('amount');
+
+      input.value = input.value.replace(/,/g, '');
+
+      document.getElementById('submitBtn').disabled = true;
+
+      return true;
+
+    }
+
+
+    // แปลงเลขเป็นตัวหนังสือ
+    function numberToThaiText(num) {
+
+      num = parseInt(num);
+
+      if (!num) return '';
+
+      const txtnum = ["ศูนย์", "หนึ่ง", "สอง", "สาม", "สี่", "ห้า", "หก", "เจ็ด", "แปด", "เก้า"];
+      const txtdigit = ["", "สิบ", "ร้อย", "พัน", "หมื่น", "แสน", "ล้าน"];
+
+      let result = '';
+      let i = 0;
+
+      while (num > 0) {
+
+        let n = num % 10;
+
+        if (i == 1 && n == 1) {
+          result = "สิบ" + result;
+        } else if (i == 1 && n == 2) {
+          result = "ยี่สิบ" + result;
+        } else if (i > 0 && n == 1) {
+          result = "เอ็ด" + txtdigit[i] + result;
+        } else if (n > 0) {
+          result = txtnum[n] + txtdigit[i] + result;
+        }
+
+        num = Math.floor(num / 10);
+        i++;
+
+      }
+
+      return result + "บาท";
+
+    }
+
+
+    // dark mode
     if (localStorage.getItem('darkMode') === 'true') {
       document.body.classList.add('dark-mode');
     }

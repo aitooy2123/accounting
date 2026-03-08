@@ -3,38 +3,6 @@
 
 @section('content')
 
-  <style>
-    .card-glass {
-      background: rgba(255, 255, 255, 0.7);
-      backdrop-filter: blur(12px);
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
-    }
-
-    .dark-mode .card-glass {
-      background: rgba(30, 41, 59, 0.7);
-      color: #fff;
-    }
-
-    .table-modern tbody tr:hover {
-      background: rgba(99, 102, 241, 0.05);
-      transition: 0.2s;
-    }
-
-    .badge-modern {
-      padding: 6px 14px;
-      border-radius: 50px;
-      font-weight: 500;
-      font-size: 13px;
-    }
-
-    .btn-modern {
-      border-radius: 8px;
-      padding: 6px 14px;
-      font-weight: 500;
-    }
-  </style>
 
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
