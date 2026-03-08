@@ -9,7 +9,7 @@
       <small class="text-muted">Expense Management</small>
     </div>
 
-    <a href="{{ route('expense.create') }}" class="btn btn-primary shadow-sm">
+    <a href="{{ route('expense.create') }}" class="btn btn-primary btn-modern shadow-sm">
       + เพิ่มรายจ่าย
     </a>
   </div>
@@ -17,14 +17,14 @@
   {{-- Summary --}}
   <div class="row mb-4">
     <div class="col-md-6">
-      <div class="card-modern p-3 text-white" style="background:linear-gradient(45deg,#ef4444,#f87171)">
+      <div class="card-glass p-4 text-white" style="background:linear-gradient(45deg,#ef4444,#f87171)">
         <h6 class="mb-1">ยอดรายจ่ายรวมทั้งหมด</h6>
         <h4>฿ {{ number_format(($data ?? collect())->sum('amount'), 2) }}</h4>
       </div>
     </div>
 
     <div class="col-md-6">
-      <div class="card-modern p-3 text-white" style="background:linear-gradient(45deg,#6b7280,#9ca3af)">
+      <div class="card-glass p-4 text-white" style="background:linear-gradient(45deg,#6b7280,#9ca3af)">
         <h6 class="mb-1">จำนวนรายการ</h6>
         <h4>{{ ($data ?? collect())->count() }} รายการ</h4>
       </div>

@@ -1,5 +1,5 @@
 <tr>
-  <td>{{ $account->code }}</td>
+  <td class="text-center">{{ $account->code }}</td>
 
   <td>
     {!! str_repeat('&nbsp;&nbsp;&nbsp;&nbsp;', $level) !!}
@@ -15,13 +15,13 @@
     {{ number_format($account->balance, 2) }}
   </td>
 
-  <td>
-    <a href="{{ route('accounts.edit', $account) }}" class="btn btn-warning btn-sm">แก้ไข</a>
+  <td class="text-center text-nowrap">
+    <a href="{{ route('accounts.edit', $account) }}" class="btn btn-outline-warning btn-modern">แก้ไข</a>
 
     <form action="{{ route('accounts.destroy', $account) }}" method="POST" style="display:inline;" onsubmit="confirmDelete(this)">
       @csrf
       @method('DELETE')
-      <button class="btn btn-danger btn-sm">ลบ</button>
+      <button class="btn btn-sm btn-outline-danger btn-modern">ลบ</button>
     </form>
   </td>
 </tr>

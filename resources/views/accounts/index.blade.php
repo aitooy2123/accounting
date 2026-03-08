@@ -3,7 +3,7 @@
 
 @section('content')
 
-  <style>
+  {{-- <style>
     :root {
       --card-light: rgba(255, 255, 255, 0.8);
       --card-dark: rgba(30, 41, 59, 0.7);
@@ -61,7 +61,7 @@
     .toggle-btn {
       border-radius: 50px;
     }
-  </style>
+  </style> --}}
 
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
@@ -70,13 +70,9 @@
     </div>
 
     <div>
-      <a href="{{ route('accounts.create') }}" class="btn btn-primary shadow-sm">
+      <a href="{{ route('accounts.create') }}" class="btn btn-primary btn-modern shadow-sm">
         + เพิ่มบัญชี
       </a>
-
-      <button onclick="toggleDark()" class="btn btn-outline-secondary ml-2 toggle-btn">
-        🌙 Dark Mode
-      </button>
     </div>
   </div>
 
@@ -85,7 +81,7 @@
       <table class="table table-bordered table-modern align-middle mb-0">
         <thead>
           <tr>
-            <th class="pl-4">รหัสบัญชี</th>
+            <th class="text-center pl-4">รหัสบัญชี</th>
             <th>ชื่อบัญชี</th>
             <th>ประเภท</th>
             <th class="text-right pr-4">ยอดคงเหลือ</th>
@@ -104,16 +100,5 @@
     </div>
   </div>
 
-  <script>
-    function toggleDark() {
-      document.body.classList.toggle('dark-mode');
-      localStorage.setItem('darkMode',
-        document.body.classList.contains('dark-mode'));
-    }
-
-    if (localStorage.getItem('darkMode') === 'true') {
-      document.body.classList.add('dark-mode');
-    }
-  </script>
 
 @endsection

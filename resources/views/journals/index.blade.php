@@ -60,10 +60,6 @@
 
     <div class="d-flex justify-content-between align-items-center mb-4">
       <h4 class="fw-bold">📘 สมุดรายวัน</h4>
-
-      <button onclick="toggleDark()" class="btn btn-light toggle-btn">
-        🌙 Dark Mode
-      </button>
     </div>
 
     @foreach ($journals as $journal)
@@ -110,15 +106,4 @@
 
   {{-- </div> --}}
 
-  <script>
-    function toggleDark() {
-      document.body.classList.toggle('dark-mode');
-      localStorage.setItem('darkMode',
-        document.body.classList.contains('dark-mode'));
-    }
-
-    if (localStorage.getItem('darkMode') === 'true') {
-      document.body.classList.add('dark-mode');
-    }
-  </script>
 @endsection

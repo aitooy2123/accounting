@@ -10,7 +10,7 @@
       <small class="text-muted">Payment Management</small>
     </div>
 
-    <a href="{{ route('payment.create') }}" class="btn btn-primary shadow-sm">
+    <a href="{{ route('payment.create') }}" class="btn btn-primary btn-modern shadow-sm">
       + เพิ่มการรับชำระ
     </a>
   </div>
@@ -18,14 +18,14 @@
   {{-- Summary --}}
   <div class="row mb-4">
     <div class="col-md-6">
-      <div class="card-modern p-3 text-white" style="background:linear-gradient(45deg,#10b981,#34d399)">
+      <div class="card-glass p-4 text-white" style="background:linear-gradient(45deg,#10b981,#34d399)">
         <h6 class="mb-1">ยอดรับชำระรวม</h6>
         <h4>฿ {{ number_format($payments->sum('amount'), 2) }}</h4>
       </div>
     </div>
 
     <div class="col-md-6">
-      <div class="card-modern p-3 text-white" style="background:linear-gradient(45deg,#6366f1,#818cf8)">
+      <div class="card-glass p-4 text-white" style="background:linear-gradient(45deg,#6366f1,#818cf8)">
         <h6 class="mb-1">จำนวนรายการ</h6>
         <h4>{{ $payments->count() }} รายการ</h4>
       </div>

@@ -2,60 +2,6 @@
 @section('title', 'รายรับ')
 
 @section('content')
-
-  <style>
-    :root {
-      --primary: #6366f1;
-      --success: #10b981;
-    }
-
-    body.dark-mode {
-      background: #0f172a;
-      color: #f1f5f9;
-    }
-
-    .card-glass {
-      background: rgba(255, 255, 255, .75);
-      backdrop-filter: blur(14px);
-      border-radius: 18px;
-      border: 1px solid rgba(255, 255, 255, .3);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, .08);
-      transition: .3s;
-    }
-
-    body.dark-mode .card-glass {
-      background: rgba(30, 41, 59, .7);
-      border: 1px solid rgba(255, 255, 255, .08);
-    }
-
-    .card-glass:hover {
-      transform: translateY(-4px);
-    }
-
-    .table-modern tbody tr {
-      transition: .2s;
-    }
-
-    .table-modern tbody tr:hover {
-      background: rgba(99, 102, 241, .05);
-    }
-
-    .badge-modern {
-      padding: 6px 14px;
-      border-radius: 50px;
-      font-size: 12px;
-      font-weight: 500;
-      background: rgba(99, 102, 241, .1);
-      color: #6366f1;
-    }
-
-    .btn-modern {
-      border-radius: 50px;
-      padding: 6px 16px;
-      font-weight: 500;
-    }
-  </style>
-
   @php
     $totalAmount = 0;
     $totalVat = 0;
