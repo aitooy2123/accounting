@@ -131,8 +131,6 @@
 
 @endsection
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
   document.addEventListener('DOMContentLoaded', function() {
 
@@ -163,18 +161,3 @@
 
   });
 </script>
-
-@if (session('success'))
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-
-      Swal.fire({
-        icon: 'success',
-        title: 'สำเร็จ',
-        text: '{{ session('success') }}',
-        confirmButtonColor: '#10b981'
-      });
-
-    });
-  </script>
-@endif

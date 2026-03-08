@@ -29,27 +29,8 @@
   @include('layouts.footer')
 
   <!-- Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script>
-    document.querySelector(".sidebar-toggle").onclick = function() {
+  @include('layouts.js')
 
-      document.querySelector(".sidebar").classList.toggle("collapsed");
-
-    }
-
-    function toggleDark() {
-
-      document.body.classList.toggle("dark-mode");
-
-    }
-
-    function mobileMenu() {
-
-      document.querySelector(".sidebar").classList.toggle("active");
-
-    }
-  </script>
   @if (session('success'))
     <script>
       document.addEventListener('DOMContentLoaded', function() {
@@ -69,6 +50,25 @@
     </script>
   @endif
 
+  @if (session('error'))
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 2500,
+          timerProgressBar: true
+        });
+
+        Toast.fire({
+          icon: 'error',
+          title: '{{ session('error') }}'
+        });
+      });
+    </script>
+  @endif
+  
 </body>
 
 </html>

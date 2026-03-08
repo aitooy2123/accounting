@@ -76,11 +76,4 @@
     <i class="fas fa-cog"></i> <span>ตั้งค่าระบบ</span>
   </a>
 
-  <form method="POST" action="{{ route('logout') }}" class="p-3 mt-4">
-    @csrf
-    <button class="btn btn-danger btn-sm btn-block">
-      <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
-    </button>
-  </form>
-
 </div>
