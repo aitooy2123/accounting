@@ -67,14 +67,14 @@
 
                 <td class="align-middle text-nowrap text-center pr-4">
 
-                  <a href="{{ route('expense.edit', $row->id) }}" class="btn btn-sm btn-outline-warning mr-1">
+                  <a href="{{ route('expense.edit', $row->id) }}" class="btn btn-sm btn-warning mr-1">
                     แก้ไข
                   </a>
 
                   <form action="{{ route('expense.destroy', $row->id) }}" method="POST" style="display:inline;" onsubmit="confirmDelete(this)">
                     @csrf
                     @method('DELETE')
-                    <button class="btn btn-sm btn-outline-danger">
+                    <button class="btn btn-sm btn-danger">
                       ลบ
                     </button>
                   </form>

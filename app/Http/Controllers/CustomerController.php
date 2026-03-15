@@ -2,83 +2,86 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
-        //
+        $data = Customer::latest()->get();
+        return view('customers.index', compact('data'));
     }
 
+    /*************  ✨ Windsurf Command ⭐  *************/
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new customer.
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    /*******  970a842c-f327-4706-911f-821cb9a19c84  *******/    public function create()
     {
-        //
+        return view('customers.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'customer_code' => 'nullable|max:20',
+            'name' => 'required|max:255',
+            'phone' => 'nullable|max:20',
+            'email' => 'nullable|email|max:100',
+            'address' => 'nullable'
+        ]);
+
+        Customer::create([
+            'customer_code' => $request->customer_code,
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'address' => $request->address
+        ]);
+
+        return redirect()->route('customers.index')
+            ->with('success', 'เพิ่มลูกค้าสำเร็จ');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
-        //
+        $row = Customer::findOrFail($id);
+        return view('customers.edit', compact('row'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'customer_code' => 'nullable|max:20',
+            'name' => 'required|max:255',
+            'phone' => 'nullable|max:20',
+            'email' => 'nullable|email|max:100',
+            'address' => 'nullable'
+        ]);
+
+        $row = Customer::findOrFail($id);
+
+        $row->update([
+            'customer_code' => $request->customer_code,
+            'name' => $request->name,
+            'phone' => $request->phone,
+            'email' => $request->email,
+            'address' => $request->address
+        ]);
+
+        return redirect()->route('customers.index')
+            ->with('success', 'แก้ไขข้อมูลสำเร็จ');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        //
+        Customer::destroy($id);
+
+        return redirect()->route('customers.index')
+            ->with('success', 'ลบข้อมูลสำเร็จ');
     }
 }
