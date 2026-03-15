@@ -71,7 +71,7 @@
         </div>
 
 
-        <div class="mb-4">
+        {{-- <div class="mb-4">
           <label>รูปธนาคาร</label>
 
           <input type="file" name="image" class="form-control @error('image') is-invalid @enderror">
@@ -82,7 +82,7 @@
             </div>
           @enderror
 
-        </div>
+        </div> --}}
 
 
         <button class="btn btn-primary">

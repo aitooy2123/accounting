@@ -13,6 +13,7 @@
     <a href="{{ route('invoice.create') }}" class="btn btn-primary btn-modern2 shadow-sm">
       + สร้างใบแจ้งหนี้
     </a>
+
   </div>
 
   {{-- Summary --}}
@@ -76,7 +77,7 @@
                 {{ $row->invoice_no }}
               </td>
 
-              <td>{{ $row->customer_name }}</td>
+              <td>{{ $row->customer->name ?? 'N/A' }}</td>
 
               <td class="text-primary font-weight-bold">
                 ฿ {{ number_format($row->total, 2) }}
@@ -100,20 +101,24 @@
                 </span>
               </td>
 
-              <td class="text-center">
+              <td class="text-center text-nowrap">
 
-                <a href="{{ route('invoice.edit', $row->id) }}" class="btn btn-sm btn-outline-warning btn-modern2 mr-1">
+                <a href="" class="btn btn-sm btn-success mr-1">
+                 ใบเสนอราคา
+                </a>
+
+                <a href="{{ route('invoice.edit', $row->id) }}" class="btn btn-sm btn-warning btn-modern2 mr-1">
                   แก้ไข
                 </a>
 
-                <a href="{{ route('invoice.show', $row->id) }}" class="btn btn-sm btn-outline-info btn-modern2 mr-1">
+                {{-- <a href="{{ route('invoice.show', $row->id) }}" class="btn btn-sm btn-info btn-modern2 mr-1">
                   ดู
-                </a>
+                </a> --}}
 
                 <form method="POST" action="{{ route('invoice.destroy', $row->id) }}" style="display:inline;" onsubmit="confirmDelete(this)">
                   @csrf
                   @method('DELETE')
-                  <button class="btn btn-sm btn-outline-danger btn-modern2">
+                  <button class="btn btn-sm btn-danger btn-modern2">
                     ลบ
                   </button>
                 </form>

@@ -45,27 +45,48 @@
         @csrf
 
         <div class="row">
+
           <div class="col-md-6 mb-3">
             <label>เลขที่ใบแจ้งหนี้</label>
-            <input type="text" name="invoice_no" class="form-control" value="{{ old('invoice_no') }}" required>
+            <input type="text" name="invoice_no" class="form-control @error('invoice_no') is-invalid @enderror" placeholder="เช่น INV-0001" value="{{ old('invoice_no') }}">
+            @error('invoice_no')
+              <div class="invalid-feedback">
+                {{ $message }}
+              </div>
+            @enderror
           </div>
 
           <div class="col-md-6 mb-3">
-            <label>วันที่</label>
-            <input type="date" name="date" class="form-control" value="{{ old('date') }}" required>
+            <label>วันที่ครบกำหนดชำระ</label>
+            <input type="date" name="due_date" class="form-control @error('due_date') is-invalid @enderror" value="{{ old('due_date') }}">
+            @error('due_date')
+              <div class="invalid-feedback">
+                {{ $message }}
+              </div>
+            @enderror
           </div>
+
         </div>
 
         <div class="mb-3">
           <label>ลูกค้า</label>
-          <select name="customer_id" class="form-control" required>
+          <select name="customer_id" class="form-control @error('customer_id') is-invalid @enderror">
             <option value="">-- เลือกลูกค้า --</option>
+
             @foreach ($customers as $customer)
               <option value="{{ $customer->id }}" {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
                 {{ $customer->name }}
               </option>
             @endforeach
+
           </select>
+
+          @error('customer_id')
+            <div class="invalid-feedback">
+              {{ $message }}
+            </div>
+          @enderror
+
         </div>
 
         <hr>
@@ -82,14 +103,35 @@
               <th width="50"></th>
             </tr>
           </thead>
+
           <tbody>
+
             <tr>
-              <td><input type="text" name="items[0][description]" class="form-control" required></td>
-              <td><input type="number" name="items[0][qty]" class="form-control qty" value="1"></td>
-              <td><input type="number" step="0.01" name="items[0][price]" class="form-control price"></td>
-              <td><input type="text" class="form-control total" readonly></td>
-              <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">X</button></td>
+
+              <td>
+                <input type="text" name="items[0][description]" class="form-control" placeholder="รายละเอียดสินค้า / บริการ" value="{{ old('items.0.description') }}">
+              </td>
+
+              <td>
+                <input type="number" name="items[0][qty]" class="form-control qty" placeholder="1" value="{{ old('items.0.qty', 1) }}">
+              </td>
+
+              <td>
+                <input type="number" step="0.01" name="items[0][price]" class="form-control price" placeholder="0.00" value="{{ old('items.0.price') }}">
+              </td>
+
+              <td>
+                <input type="text" class="form-control total" placeholder="0.00" readonly>
+              </td>
+
+              <td>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">
+                  X
+                </button>
+              </td>
+
             </tr>
+
           </tbody>
         </table>
 
@@ -108,25 +150,42 @@
       </form>
 
     </div>
-
   </div>
 
   <script>
     let rowIndex = 1;
 
     function addRow() {
+
       let table = document.getElementById('itemTable').getElementsByTagName('tbody')[0];
       let row = table.insertRow();
 
       row.innerHTML = `
-    <td><input type="text" name="items[${rowIndex}][description]" class="form-control" required></td>
-    <td><input type="number" name="items[${rowIndex}][qty]" class="form-control qty" value="1"></td>
-    <td><input type="number" step="0.01" name="items[${rowIndex}][price]" class="form-control price"></td>
-    <td><input type="text" class="form-control total" readonly></td>
-    <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">X</button></td>
-  `;
+
+<td>
+<input type="text" name="items[${rowIndex}][description]" class="form-control" placeholder="รายละเอียดสินค้า / บริการ">
+</td>
+
+<td>
+<input type="number" name="items[${rowIndex}][qty]" class="form-control qty" value="1">
+</td>
+
+<td>
+<input type="number" step="0.01" name="items[${rowIndex}][price]" class="form-control price" placeholder="0.00">
+</td>
+
+<td>
+<input type="text" class="form-control total" placeholder="0.00" readonly>
+</td>
+
+<td>
+<button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)">X</button>
+</td>
+
+`;
 
       rowIndex++;
+
     }
 
     function removeRow(btn) {
@@ -135,27 +194,35 @@
     }
 
     document.addEventListener('input', function(e) {
+
       if (e.target.classList.contains('qty') || e.target.classList.contains('price')) {
         calculate();
       }
+
     });
 
     function calculate() {
+
       let rows = document.querySelectorAll('#itemTable tbody tr');
       let grand = 0;
 
       rows.forEach(row => {
+
         let qty = row.querySelector('.qty').value || 0;
         let price = row.querySelector('.price').value || 0;
+
         let total = qty * price;
+
         row.querySelector('.total').value = total.toFixed(2);
+
         grand += total;
+
       });
 
       document.getElementById('grandTotal').innerText = grand.toFixed(2);
+
     }
 
-    // dark mode load
     if (localStorage.getItem('darkMode') === 'true') {
       document.body.classList.add('dark-mode');
     }

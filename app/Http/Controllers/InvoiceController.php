@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Income;
-use App\Models\Category;
-use App\Models\Customer;
 use App\Models\Invoice;
+use App\Models\Customer;
 use Illuminate\Http\Request;
 
 class InvoiceController extends Controller
@@ -19,67 +17,70 @@ class InvoiceController extends Controller
     public function create()
     {
         $customers = Customer::latest()->get();
-
         return view('invoice.create', compact('customers'));
     }
 
     public function store(Request $request)
     {
-        $year = date('Y', strtotime($request->due_date));
+        $request->validate([
+            'invoice_no' => 'required',
+            'customer_id' => 'required|exists:customers,id',
+            'due_date' => 'required|date',
+            'items' => 'required|array'
+        ]);
 
-        if ($year == 2026) {
-            $vat_rate = 0.10;
-        } else {
-            $vat_rate = 0.07;
+        $total = 0;
+
+        foreach ($request->items as $item) {
+
+            $qty = $item['qty'] ?? 0;
+            $price = $item['price'] ?? 0;
+
+            $total += $qty * $price;
         }
-
-        $vat = $request->total * $vat_rate;
-        $grand = $request->total + $vat;
 
         Invoice::create([
             'invoice_no' => $request->invoice_no,
-            'customer_name' => $request->customer_name,
-            'total' => $request->total,
-            'vat' => $vat,
-            'grand_total' => $grand,
-            'due_date' => $request->due_date
+            'customer_id' => $request->customer_id,
+            'total' => $total,
+            'paid' => 0,
+            'due_date' => $request->due_date,
+            'status' => 0
         ]);
 
-        return redirect()->route('invoice.index');
+        return redirect()->route('invoice.index')
+            ->with('success', 'สร้างใบแจ้งหนี้สำเร็จ');
     }
 
     public function edit($id)
     {
-        $income = Income::findOrFail($id);
-        $categories = Category::where('type', 'income')->get();
+        $invoice = Invoice::findOrFail($id);
+        $customers = Customer::latest()->get();
 
-        return view('income.edit', compact('income', 'categories'));
+        return view('invoice.edit', compact('invoice', 'customers'));
     }
 
     public function update(Request $request, $id)
     {
         $request->validate([
-            'date' => 'required|date',
-            'category_id' => 'required',
-            'amount' => 'required|numeric|min:0',
+            'invoice_no' => 'required',
+            'due_date' => 'required|date'
         ]);
 
-        $income = Income::findOrFail($id);
+        $invoice = Invoice::findOrFail($id);
 
-        $income->update([
-            'date' => $request->date,
-            'category_id' => $request->category_id,
-            'amount' => $request->amount,
-            'description' => $request->description,
+        $invoice->update([
+            'invoice_no' => $request->invoice_no,
+            'due_date' => $request->due_date
         ]);
 
-        return redirect()->route('income.index')
-            ->with('success', 'อัปเดตข้อมูลสำเร็จ');
+        return redirect()->route('invoice.index')
+            ->with('success', 'อัปเดตใบแจ้งหนี้สำเร็จ');
     }
 
     public function destroy($id)
     {
         Invoice::findOrFail($id)->delete();
-        return back();
+        return back()->with('success', 'ลบข้อมูลสำเร็จ');
     }
 }
