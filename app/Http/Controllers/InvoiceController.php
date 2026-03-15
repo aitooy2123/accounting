@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Income;
 use App\Models\Category;
+use App\Models\Customer;
 use App\Models\Invoice;
 use Illuminate\Http\Request;
 
@@ -17,7 +18,9 @@ class InvoiceController extends Controller
 
     public function create()
     {
-        return view('invoice.create');
+        $customers = Customer::latest()->get();
+
+        return view('invoice.create', compact('customers'));
     }
 
     public function store(Request $request)

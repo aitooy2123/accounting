@@ -14,13 +14,7 @@ class CustomerController extends Controller
         return view('customers.index', compact('data'));
     }
 
-    /*************  ✨ Windsurf Command ⭐  *************/
-    /**
-     * Show the form for creating a new customer.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    /*******  970a842c-f327-4706-911f-821cb9a19c84  *******/    public function create()
+   public function create()
     {
         return view('customers.create');
     }

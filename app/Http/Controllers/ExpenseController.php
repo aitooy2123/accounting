@@ -24,7 +24,7 @@ class ExpenseController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());    
+        // dd($request->all());
         $data = $request->validate([
             'date' => 'required',
             'amount' => 'required|numeric',
@@ -49,9 +49,22 @@ class ExpenseController extends Controller
 
     public function update(Request $request, $id)
     {
-        $data = Expense::findOrFail($id);
-        $data->update($request->all());
-        return redirect()->route('expense.index');
+
+        $data = $request->validate([
+            'date' => 'required',
+            'amount' => 'required|numeric',
+            'category_id' => 'required',
+            'description' => 'nullable|max:255'
+        ]);
+
+        $data['date'] = Carbon::createFromFormat('d/m/Y', $data['date'])->format('Y-m-d');
+
+        $expense = Expense::findOrFail($id);
+
+        $expense->update($data);
+
+        return redirect()->route('expense.index')
+            ->with('success', 'แก้ไขรายจ่ายสำเร็จ');
     }
 
     public function destroy($id)

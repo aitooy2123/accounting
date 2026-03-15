@@ -60,11 +60,11 @@
           <label>ลูกค้า</label>
           <select name="customer_id" class="form-control" required>
             <option value="">-- เลือกลูกค้า --</option>
-            {{-- @foreach ($customers as $customer)
+            @foreach ($customers as $customer)
               <option value="{{ $customer->id }}" {{ old('customer_id') == $customer->id ? 'selected' : '' }}>
                 {{ $customer->name }}
               </option>
-            @endforeach --}}
+            @endforeach
           </select>
         </div>
 
