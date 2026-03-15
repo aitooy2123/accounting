@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\Customer;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class InvoiceController extends Controller
 {
@@ -20,21 +21,27 @@ class InvoiceController extends Controller
         return view('invoice.create', compact('customers'));
     }
 
+
     public function store(Request $request)
     {
         $request->validate([
             'invoice_no' => 'required',
             'customer_id' => 'required|exists:customers,id',
-            'due_date' => 'required|date',
+            'due_date' => 'required|date_format:d/m/Y',
             'items' => 'required|array'
         ]);
+
+        $due_date = Carbon::createFromFormat('d/m/Y', $request->due_date)->format('Y-m-d');
 
         $total = 0;
 
         foreach ($request->items as $item) {
 
-            $qty = $item['qty'] ?? 0;
-            $price = $item['price'] ?? 0;
+            $qty = isset($item['qty']) ? (int)$item['qty'] : 0;
+
+            $price = isset($item['price'])
+                ? (float) str_replace(',', '', $item['price'])
+                : 0;
 
             $total += $qty * $price;
         }
@@ -44,7 +51,7 @@ class InvoiceController extends Controller
             'customer_id' => $request->customer_id,
             'total' => $total,
             'paid' => 0,
-            'due_date' => $request->due_date,
+            'due_date' => $due_date,
             'status' => 0
         ]);
 

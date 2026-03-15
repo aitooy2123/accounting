@@ -18,11 +18,15 @@ class Invoice extends Model
         'status'
     ];
 
+    protected $casts = [
+        'due_date' => 'date:Y-m-d',
+    ];
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);
     }
-    
+
     public function payments()
     {
         return $this->hasMany(Payment::class);

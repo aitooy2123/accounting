@@ -96,7 +96,7 @@
               </td>
 
               <td class="text-center">
-                <span class="badge-modern text-white" style="background:{{ $color }}">
+                <span class="badge badge-info" style="background:{{ $color }}">
                   {{ $status }}
                 </span>
               </td>
