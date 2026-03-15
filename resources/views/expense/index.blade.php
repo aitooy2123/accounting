@@ -31,66 +31,64 @@
     </div>
   </div>
 
-  <div class="card card-modern border-0 shadow-sm">
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table table-hover mb-0">
-          <thead style="background:#f8fafc;">
+  <div class="glass-card p-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-bordered table-modern align-middle mb-0  table-hover">
+        <thead style="background:#f8fafc;">
+          <tr>
+            <th class="pl-4">วันที่</th>
+            <th>หมวดหมู่</th>
+            <th>จำนวนเงิน</th>
+            <th>รายละเอียด</th>
+            <th class="text-center pr-4" width="150">จัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          @forelse($data ?? [] as $row)
             <tr>
-              <th class="pl-4">วันที่</th>
-              <th>หมวดหมู่</th>
-              <th>จำนวนเงิน</th>
-              <th>รายละเอียด</th>
-              <th class="text-center pr-4" width="150">จัดการ</th>
+              <td class="pl-4 align-middle">
+                {{ \Carbon\Carbon::parse($row->date)->format('d/m/Y') }}
+              </td>
+
+              <td class="align-middle">
+                <span class="badge badge-light px-3 py-2">
+                  {{ $row->category->name ?? '-' }}
+                </span>
+              </td>
+
+              <td class="align-middle text-danger font-weight-bold">
+                ฿ {{ number_format($row->amount, 2) }}
+              </td>
+
+              <td class="align-middle text-muted">
+                {{ $row->description }}
+              </td>
+
+              <td class="align-middle text-nowrap text-center pr-4">
+
+                <a href="{{ route('expense.edit', $row->id) }}" class="btn btn-sm btn-warning mr-1">
+                  แก้ไข
+                </a>
+
+                <form action="{{ route('expense.destroy', $row->id) }}" method="POST" style="display:inline;" onsubmit="confirmDelete(this)">
+                  @csrf
+                  @method('DELETE')
+                  <button class="btn btn-sm btn-danger">
+                    ลบ
+                  </button>
+                </form>
+
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            @forelse($data ?? [] as $row)
-              <tr>
-                <td class="pl-4 align-middle">
-                  {{ \Carbon\Carbon::parse($row->date)->format('d/m/Y') }}
-                </td>
-
-                <td class="align-middle">
-                  <span class="badge badge-light px-3 py-2">
-                    {{ $row->category->name ?? '-' }}
-                  </span>
-                </td>
-
-                <td class="align-middle text-danger font-weight-bold">
-                  ฿ {{ number_format($row->amount, 2) }}
-                </td>
-
-                <td class="align-middle text-muted">
-                  {{ $row->description }}
-                </td>
-
-                <td class="align-middle text-nowrap text-center pr-4">
-
-                  <a href="{{ route('expense.edit', $row->id) }}" class="btn btn-sm btn-warning mr-1">
-                    แก้ไข
-                  </a>
-
-                  <form action="{{ route('expense.destroy', $row->id) }}" method="POST" style="display:inline;" onsubmit="confirmDelete(this)">
-                    @csrf
-                    @method('DELETE')
-                    <button class="btn btn-sm btn-danger">
-                      ลบ
-                    </button>
-                  </form>
-
-                </td>
-              </tr>
-            @empty
-              <tr>
-                <td colspan="5" class="text-center py-4 text-muted">
-                  ไม่มีข้อมูลรายจ่าย
-                </td>
-              </tr>
-            @endforelse
-          </tbody>
-        </table>
-      </div>
+          @empty
+            <tr>
+              <td colspan="5" class="text-center text-muted">
+                ไม่มีข้อมูลรายจ่าย
+              </td>
+            </tr>
+          @endforelse
+        </tbody>
+      </table>
     </div>
   </div>
 

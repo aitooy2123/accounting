@@ -14,68 +14,78 @@
     </a>
   </div>
 
-  <div class="card card-modern border-0 shadow-sm">
-    <div class="card-body p-0">
-      <div class="table-responsive">
+  <div class="glass-card p-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-bordered table-modern align-middle mb-0 table-hover">
+        <thead style="background:#f8fafc;">
+          <tr>
+            <th class="pl-4">รหัส</th>
+            <th>ชื่อลูกค้า</th>
+            <th>โทรศัพท์</th>
+            <th>Email</th>
+            <th class="text-center pr-4" width="150">จัดการ</th>
+          </tr>
+        </thead>
 
-        <table class="table table-hover mb-0">
-          <thead style="background:#f8fafc;">
+        <tbody>
+
+          @forelse($data as $row)
             <tr>
-              <th class="pl-4">รหัส</th>
-              <th>ชื่อลูกค้า</th>
-              <th>โทรศัพท์</th>
-              <th>Email</th>
-              <th class="text-center pr-4" width="150">จัดการ</th>
+
+              <td class="pl-4">{{ $row->customer_code }}</td>
+
+              <td>{{ $row->name }}</td>
+
+              <td>{{ $row->phone }}</td>
+
+              <td>{{ $row->email }}</td>
+
+              <td class="text-center text-nowrap pr-4">
+
+                <a href="{{ route('customers.edit', $row->id) }}" class="btn btn-sm btn-warning mr-1">
+                  แก้ไข
+                </a>
+
+                <form action="{{ route('customers.destroy', $row->id) }}" method="POST" style="display:inline;">
+                  @csrf
+                  @method('DELETE')
+
+                  <button class="btn btn-sm btn-danger">
+                    ลบ
+                  </button>
+
+                </form>
+
+              </td>
+
             </tr>
-          </thead>
 
-          <tbody>
+          @empty
 
-            @forelse($data as $row)
-              <tr>
+            <tr>
+              <td colspan="5" class="text-center py-4 text-muted">
+                ไม่มีข้อมูลลูกค้า
+              </td>
+            </tr>
+          @endforelse
 
-                <td class="pl-4">{{ $row->customer_code }}</td>
+        </tbody>
 
-                <td>{{ $row->name }}</td>
+      </table>
 
-                <td>{{ $row->phone }}</td>
+      <div class="d-flex justify-content-between align-items-center mt-3 px-3">
 
-                <td>{{ $row->email }}</td>
+        <div>
+          แสดง {{ $data->firstItem() }} ถึง {{ $data->lastItem() }}
+          จาก {{ $data->total() }} รายการ
+        </div>
 
-                <td class="text-center text-nowrap pr-4">
-
-                  <a href="{{ route('customers.edit', $row->id) }}" class="btn btn-sm btn-warning mr-1">
-                    แก้ไข
-                  </a>
-
-                  <form action="{{ route('customers.destroy', $row->id) }}" method="POST" style="display:inline;">
-                    @csrf
-                    @method('DELETE')
-
-                    <button class="btn btn-sm btn-danger">
-                      ลบ
-                    </button>
-
-                  </form>
-
-                </td>
-
-              </tr>
-
-            @empty
-
-              <tr>
-                <td colspan="5" class="text-center py-4 text-muted">
-                  ไม่มีข้อมูลลูกค้า
-                </td>
-              </tr>
-            @endforelse
-
-          </tbody>
-
-        </table>
+        <div>
+          {{ $data->links() }}
+        </div>
 
       </div>
+
     </div>
   </div>
 

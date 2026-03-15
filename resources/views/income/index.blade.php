@@ -65,7 +65,7 @@
 
     <div class="table-responsive">
 
-      <table class="table table-borderless table-modern mb-0">
+      <table class="table table-borderless table-modern mb-0 table-hover">
 
         <thead style="background:#f1f5f9;">
           <tr>
@@ -147,7 +147,7 @@
           @empty
 
             <tr>
-              <td colspan="8" class="text-center py-5 text-muted">
+              <td colspan="8" class="text-center text-muted">
                 ไม่มีข้อมูลรายรับ
               </td>
             </tr>

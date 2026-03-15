@@ -14,62 +14,61 @@
 
   </div>
 
-  <div class="card card-modern border-0 shadow-sm">
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table table-hover mb-0">
-          <thead style="background:#f8fafc;">
+  <div class="glass-card p-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-bordered table-modern align-middle mb-0 table-hover">
+        <thead style="background:#f8fafc;">
 
 
 
+          <tr>
+
+            <th>รหัสผู้ขาย</th>
+            <th>ชื่อผู้ขาย</th>
+            <th>เบอร์โทร</th>
+            <th>อีเมล</th>
+            <th width="150">จัดการ</th>
+
+          </tr>
+        </thead>
+
+        <tbody>
+
+          @forelse ($data as $row)
             <tr>
+              <td>{{ $row->supplier_code }}</td>
+              <td>{{ $row->name }}</td>
+              <td>{{ $row->phone }}</td>
+              <td>{{ $row->email }}</td>
 
-              <th>รหัสผู้ขาย</th>
-              <th>ชื่อผู้ขาย</th>
-              <th>เบอร์โทร</th>
-              <th>อีเมล</th>
-              <th width="150">จัดการ</th>
+              <td>
+                <a href="{{ route('suppliers.edit', $row->id) }}" class="btn btn-sm btn-warning">
+                  Edit
+                </a>
 
+                <form action="{{ route('suppliers.destroy', $row->id) }}" method="POST" style="display:inline">
+                  @csrf
+                  @method('DELETE')
+
+                  <button class="btn btn-sm btn-danger">
+                    Delete
+                  </button>
+                </form>
+              </td>
             </tr>
-          </thead>
 
-          <tbody>
+          @empty
+            <tr>
+              <td colspan="5" class="text-center">
+                ไม่พบข้อมูล
+              </td>
+            </tr>
+          @endforelse
 
-            @foreach ($data as $row)
-              <tr>
+        </tbody>
 
-                <td>{{ $row->supplier_code }}</td>
-                <td>{{ $row->name }}</td>
-                <td>{{ $row->phone }}</td>
-                <td>{{ $row->email }}</td>
+      </table>
 
-                <td>
-
-                  <a href="{{ route('suppliers.edit', $row->id) }}" class="btn btn-sm btn-warning">
-                    Edit
-                  </a>
-
-                  <form action="{{ route('suppliers.destroy', $row->id) }}" method="POST" style="display:inline">
-
-                    @csrf
-                    @method('DELETE')
-
-                    <button class="btn btn-sm btn-danger">
-                      Delete
-                    </button>
-
-                  </form>
-
-                </td>
-
-              </tr>
-            @endforeach
-
-          </tbody>
-
-        </table>
-
-      </div>
     </div>
   </div>
 

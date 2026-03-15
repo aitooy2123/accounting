@@ -70,7 +70,7 @@
     </div>
 
     <div>
-      <a href="{{ route('accounts.create') }}" class="btn btn-primary btn-modern shadow-sm">
+      <a href="{{ route('accounts.create') }}" class="btn btn-primary btn-modern2 shadow-sm">
         + เพิ่มบัญชี
       </a>
     </div>
@@ -78,7 +78,7 @@
 
   <div class="glass-card p-0 shadow-sm">
     <div class="table-responsive">
-      <table class="table table-bordered table-modern align-middle mb-0">
+      <table class="table table-bordered table-modern align-middle mb-0 table-hover">
         <thead>
           <tr>
             <th class="text-center pl-4">รหัสบัญชี</th>
@@ -89,14 +89,84 @@
           </tr>
         </thead>
         <tbody>
-          @foreach ($accounts as $account)
-            @include('accounts.partials.row', [
-                'account' => $account,
-                'level' => 0,
-            ])
-          @endforeach
+          @forelse ($accounts as $account)
+
+            <tr>
+              <td class="text-center">{{ $account->code }}</td>
+
+              <td>
+                {{ $account->name }}
+              </td>
+
+              <td>{{ $account->type }}</td>
+
+              <td class="text-right">
+                {{ number_format($account->balance, 2) }}
+              </td>
+
+              <td class="text-center text-nowrap">
+                <a href="{{ route('accounts.edit', $account) }}" class="btn btn-warning btn-modern2">แก้ไข</a>
+
+                <form action="{{ route('accounts.destroy', $account) }}" method="POST" style="display:inline;" onsubmit="confirmDelete(this)">
+                  @csrf
+                  @method('DELETE')
+                  <button class="btn btn-sm btn-danger btn-modern2">ลบ</button>
+                </form>
+              </td>
+            </tr>
+
+            @if ($account->children && $account->children->count())
+              @foreach ($account->children as $child)
+                <tr>
+                  <td class="text-center">{{ $child->code }}</td>
+
+                  <td>
+                    &nbsp;&nbsp;&nbsp;&nbsp; └─ {{ $child->name }}
+                  </td>
+
+                  <td>{{ $child->type }}</td>
+
+                  <td class="text-right">
+                    {{ number_format($child->balance, 2) }}
+                  </td>
+
+                  <td class="text-center text-nowrap">
+                    <a href="{{ route('accounts.edit', $child) }}" class="btn btn-warning btn-modern2">แก้ไข</a>
+
+                    <form action="{{ route('accounts.destroy', $child) }}" method="POST" style="display:inline;" onsubmit="confirmDelete(this)">
+                      @csrf
+                      @method('DELETE')
+                      <button class="btn btn-sm btn-danger btn-modern2">ลบ</button>
+                    </form>
+                  </td>
+                </tr>
+              @endforeach
+            @endif
+
+          @empty
+            <tr>
+              <td colspan="5" class="text-center text-muted py-4">
+                ไม่พบข้อมูลบัญชี
+              </td>
+            </tr>
+          @endforelse
+
         </tbody>
       </table>
+
+      <div class="d-flex justify-content-between align-items-center mt-3 px-3">
+
+        <div>
+          แสดง {{ $accounts->firstItem() }} ถึง {{ $accounts->lastItem() }}
+          จาก {{ $accounts->total() }} รายการ
+        </div>
+
+        <div>
+          {{ $accounts->links() }}
+        </div>
+
+      </div>
+
     </div>
   </div>
 

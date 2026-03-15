@@ -25,7 +25,15 @@ class InvoiceController extends Controller
 
     public function store(Request $request)
     {
-        $vat = $request->total * 0.07;
+        $year = date('Y', strtotime($request->due_date));
+
+        if ($year == 2026) {
+            $vat_rate = 0.10;
+        } else {
+            $vat_rate = 0.07;
+        }
+
+        $vat = $request->total * $vat_rate;
         $grand = $request->total + $vat;
 
         Invoice::create([
@@ -36,7 +44,7 @@ class InvoiceController extends Controller
             'grand_total' => $grand,
             'due_date' => $request->due_date
         ]);
-        // Invoice::create($request->all());
+
         return redirect()->route('invoice.index');
     }
 

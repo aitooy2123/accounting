@@ -10,7 +10,7 @@
       <small class="text-muted">Payment Management</small>
     </div>
 
-    <a href="{{ route('payment.create') }}" class="btn btn-primary btn-modern shadow-sm">
+    <a href="{{ route('payment.create') }}" class="btn btn-primary btn-modern2 shadow-sm">
       + เพิ่มการรับชำระ
     </a>
   </div>
@@ -32,66 +32,64 @@
     </div>
   </div>
 
-  <div class="card card-modern border-0 shadow-sm">
-    <div class="card-body p-0">
-      <div class="table-responsive">
-          <table class="table table-bordered table-modern align-middle mb-0">
-          <thead style="">
+  <div class="glass-card p-0 shadow-sm">
+    <div class="table-responsive">
+      <table class="table table-bordered table-modern align-middle mb-0 table-hover">
+        <thead style="background:#f8fafc;">
+          <tr>
+            <th class="pl-4">#</th>
+            <th>เลขที่ใบแจ้งหนี้</h>
+            <th>จำนวนเงิน</th>
+            <th>วันที่ชำระ</th>
+            <th class="text-center pr-4" width="150">จัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          @forelse($payments as $key => $payment)
             <tr>
-              <th class="pl-4">#</th>
-              <th>เลขที่ใบแจ้งหนี้</h>
-              <th>จำนวนเงิน</th>
-              <th>วันที่ชำระ</th>
-              <th class="text-center pr-4" width="150">จัดการ</th>
+              <td class="pl-4 align-middle">
+                <span class="badge badge-light">
+                  {{ $key + 1 }}
+                </span>
+              </td>
+
+              <td class="align-middle font-weight-bold">
+                {{ $payment->invoice->invoice_no ?? '-' }}
+              </td>
+
+              <td class="align-middle text-success font-weight-bold">
+                ฿ {{ number_format($payment->amount, 2) }}
+              </td>
+
+              <td class="align-middle">
+                {{ \Carbon\Carbon::parse($payment->payment_date)->format('d/m/Y') }}
+              </td>
+
+              <td class="align-middle text-center pr-4">
+
+                <a href="{{ route('payment.edit', $payment->id) }}" class="btn btn-sm btn-warning mr-1">
+                  แก้ไข
+                </a>
+
+                <form action="{{ route('payment.destroy', $payment->id) }}" method="POST" style="display:inline;" onsubmit="confirmDelete(this)">
+                  @csrf
+                  @method('DELETE')
+                  <button class="btn btn-sm btn-danger">
+                    ลบ
+                  </button>
+                </form>
+
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            @forelse($payments as $key => $payment)
-              <tr>
-                <td class="pl-4 align-middle">
-                  <span class="badge badge-light">
-                    {{ $key + 1 }}
-                  </span>
-                </td>
-
-                <td class="align-middle font-weight-bold">
-                  {{ $payment->invoice->invoice_no ?? '-' }}
-                </td>
-
-                <td class="align-middle text-success font-weight-bold">
-                  ฿ {{ number_format($payment->amount, 2) }}
-                </td>
-
-                <td class="align-middle">
-                  {{ \Carbon\Carbon::parse($payment->payment_date)->format('d/m/Y') }}
-                </td>
-
-                <td class="align-middle text-center pr-4">
-
-                  <a href="{{ route('payment.edit', $payment->id) }}" class="btn btn-sm btn-outline-warning mr-1">
-                    แก้ไข
-                  </a>
-
-                  <form action="{{ route('payment.destroy', $payment->id) }}" method="POST" style="display:inline;" onsubmit="confirmDelete(this)">
-                    @csrf
-                    @method('DELETE')
-                    <button class="btn btn-sm btn-outline-danger">
-                      ลบ
-                    </button>
-                  </form>
-
-                </td>
-              </tr>
-            @empty
-              <tr>
-                <td colspan="5" class="text-center py-4 text-muted">
-                  ไม่มีข้อมูลการรับชำระ
-                </td>
-              </tr>
-            @endforelse
-          </tbody>
-        </table>
-      </div>
+          @empty
+            <tr>
+              <td colspan="5" class="text-center  text-muted">
+                ไม่มีข้อมูลการรับชำระ
+              </td>
+            </tr>
+          @endforelse
+        </tbody>
+      </table>
     </div>
   </div>
 

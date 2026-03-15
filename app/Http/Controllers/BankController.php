@@ -2,83 +2,74 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bank;
+use App\Models\RefBank;
 use Illuminate\Http\Request;
 
 class BankController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function index()
     {
-        //
+        $banks = Bank::with('refBank')
+            ->orderBy('id','desc')
+            ->get();
+
+        return view('banks.index', compact('banks'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+
     public function create()
     {
-        //
+        $refBanks = RefBank::orderBy('name')->get();
+        return view('banks.create', compact('refBanks'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'ref_bank_id' => 'required|exists:ref_banks,id',
+            'account_name' => 'required|string|max:255',
+            'account_number' => 'required|string|max:50'
+        ]);
+
+        Bank::create($data);
+
+        return redirect()->route('banks.index')->with('success', 'เพิ่มบัญชีธนาคารสำเร็จ');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
-        //
+        $bank = Bank::findOrFail($id);
+        $refBanks = RefBank::orderBy('name')->get();
+
+        return view('banks.edit', compact('bank', 'refBanks'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function update(Request $request, $id)
     {
-        //
+        $bank = Bank::findOrFail($id);
+
+        $data = $request->validate([
+            'ref_bank_id' => 'required|exists:ref_banks,id',
+            'account_name' => 'required|string|max:255',
+            'account_number' => 'required|string|max:50'
+        ]);
+
+        $bank->update($data);
+
+        return redirect()->route('banks.index')->with('success', 'แก้ไขบัญชีธนาคารสำเร็จ');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+
     public function destroy($id)
     {
-        //
+        $bank = Bank::findOrFail($id);
+        $bank->delete();
+
+        return redirect()->route('banks.index')->with('success', 'ลบบัญชีธนาคารแล้ว');
     }
 }

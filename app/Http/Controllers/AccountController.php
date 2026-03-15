@@ -13,7 +13,7 @@ class AccountController extends Controller
         $accounts = Account::whereNull('parent_id')
             ->with('children')
             ->orderBy('code')
-            ->get();
+            ->paginate(10);
 
         return view('accounts.index', compact('accounts'));
     }

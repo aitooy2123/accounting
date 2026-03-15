@@ -10,7 +10,7 @@
       <small class="text-muted">Invoice Management</small>
     </div>
 
-    <a href="{{ route('invoice.create') }}" class="btn btn-primary btn-modern shadow-sm">
+    <a href="{{ route('invoice.create') }}" class="btn btn-primary btn-modern2 shadow-sm">
       + สร้างใบแจ้งหนี้
     </a>
   </div>
@@ -42,7 +42,7 @@
   <div class="card-glass p-0">
 
     <div class="table-responsive">
-      <table class="table table-borderless table-modern mb-0">
+      <table class="table table-borderless table-modern mb-0  table-hover">
         <thead>
           <tr style="background:#f1f5f9;">
             <th class="pl-4">เลขที่</th>
@@ -102,18 +102,18 @@
 
               <td class="text-center">
 
-                <a href="{{ route('invoice.edit', $row->id) }}" class="btn btn-sm btn-outline-warning btn-modern mr-1">
+                <a href="{{ route('invoice.edit', $row->id) }}" class="btn btn-sm btn-outline-warning btn-modern2 mr-1">
                   แก้ไข
                 </a>
 
-                <a href="{{ route('invoice.show', $row->id) }}" class="btn btn-sm btn-outline-info btn-modern mr-1">
+                <a href="{{ route('invoice.show', $row->id) }}" class="btn btn-sm btn-outline-info btn-modern2 mr-1">
                   ดู
                 </a>
 
                 <form method="POST" action="{{ route('invoice.destroy', $row->id) }}" style="display:inline;" onsubmit="confirmDelete(this)">
                   @csrf
                   @method('DELETE')
-                  <button class="btn btn-sm btn-outline-danger btn-modern">
+                  <button class="btn btn-sm btn-outline-danger btn-modern2">
                     ลบ
                   </button>
                 </form>
@@ -123,7 +123,7 @@
 
           @empty
             <tr>
-              <td colspan="8" class="text-center py-5 text-muted">
+              <td colspan="8" class="text-center text-muted">
                 ไม่มีข้อมูลใบแจ้งหนี้
               </td>
             </tr>
