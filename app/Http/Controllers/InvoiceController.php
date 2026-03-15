@@ -22,28 +22,36 @@ class InvoiceController extends Controller
     }
 
 
+
     public function store(Request $request)
     {
         $request->validate([
             'invoice_no' => 'required',
             'customer_id' => 'required|exists:customers,id',
-            'due_date' => 'required|date_format:d/m/Y',
+            'due_date' => 'required',
             'items' => 'required|array'
         ]);
 
         $due_date = Carbon::createFromFormat('d/m/Y', $request->due_date)->format('Y-m-d');
 
+        $items = [];
         $total = 0;
 
         foreach ($request->items as $item) {
 
-            $qty = isset($item['qty']) ? (int)$item['qty'] : 0;
+            $qty = (int) ($item['qty'] ?? 0);
+            $price = (float) str_replace(',', '', $item['price'] ?? 0);
 
-            $price = isset($item['price'])
-                ? (float) str_replace(',', '', $item['price'])
-                : 0;
+            $line_total = $qty * $price;
 
-            $total += $qty * $price;
+            $items[] = [
+                'description' => $item['description'] ?? '',
+                'qty' => $qty,
+                'price' => $price,
+                'total' => $line_total
+            ];
+
+            $total += $line_total;
         }
 
         Invoice::create([
@@ -52,7 +60,8 @@ class InvoiceController extends Controller
             'total' => $total,
             'paid' => 0,
             'due_date' => $due_date,
-            'status' => 0
+            'status' => 0,
+            'items' => $items
         ]);
 
         return redirect()->route('invoice.index')
@@ -71,20 +80,56 @@ class InvoiceController extends Controller
     {
         $request->validate([
             'invoice_no' => 'required',
-            'due_date' => 'required|date'
+            'customer_id' => 'required|exists:customers,id',
+            'due_date' => 'required',
+            'items' => 'required|array'
         ]);
+
+        $due_date = Carbon::createFromFormat('d/m/Y', $request->due_date)->format('Y-m-d');
+
+        $items = [];
+        $total = 0;
+
+        foreach ($request->items as $item) {
+
+            $qty = (int) ($item['qty'] ?? 0);
+            $price = (float) str_replace(',', '', $item['price'] ?? 0);
+
+            $line_total = $qty * $price;
+
+            $items[] = [
+                'description' => $item['description'] ?? '',
+                'qty' => $qty,
+                'price' => $price,
+                'total' => $line_total
+            ];
+
+            $total += $line_total;
+        }
+
+        $status = $request->status ?? 0;
+
+        $paid = str_replace(',', '', $request->paid ?? 0);
+
+        if ($status == 1 && $paid == 0) {
+            $paid = $total;
+        }
 
         $invoice = Invoice::findOrFail($id);
 
         $invoice->update([
             'invoice_no' => $request->invoice_no,
-            'due_date' => $request->due_date
+            'customer_id' => $request->customer_id,
+            'due_date' => $due_date,
+            'total' => $total,
+            'paid' => $paid,
+            'status' => $status,
+            'items' => $items
         ]);
 
         return redirect()->route('invoice.index')
             ->with('success', 'อัปเดตใบแจ้งหนี้สำเร็จ');
     }
-
     public function destroy($id)
     {
         Invoice::findOrFail($id)->delete();

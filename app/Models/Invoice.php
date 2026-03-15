@@ -15,11 +15,13 @@ class Invoice extends Model
         'total',
         'paid',
         'due_date',
-        'status'
+        'status',
+        'items'
     ];
 
     protected $casts = [
         'due_date' => 'date:Y-m-d',
+        'items' => 'array'
     ];
 
     public function customer()
