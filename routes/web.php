@@ -21,14 +21,14 @@ Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/', [DashboardController::class,'index'])->name('dashboard');
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     // การเงิน
     Route::resource('income', IncomeController::class);
     Route::resource('expense', ExpenseController::class);
     Route::resource('invoice', InvoiceController::class);
     Route::resource('payment', PaymentController::class);
-
+    Route::post('/invoice/{invoice}/payment', [InvoiceController::class, 'storePayment'])->name('invoice.payment.store');
     // ลูกหนี้ / เจ้าหนี้
     Route::resource('customers', CustomerController::class);
     Route::resource('suppliers', SupplierController::class);
@@ -45,16 +45,12 @@ Route::middleware(['auth'])->group(function () {
     // รายงาน
     Route::prefix('reports')->name('reports.')->group(function () {
 
-        Route::get('trial-balance', [ReportController::class,'trialBalance'])->name('trial_balance');
+        Route::get('trial-balance', [ReportController::class, 'trialBalance'])->name('trial_balance');
 
-        Route::get('profit-loss', [ReportController::class,'profitLoss'])->name('profit_loss');
+        Route::get('profit-loss', [ReportController::class, 'profitLoss'])->name('profit_loss');
 
-        Route::get('balance-sheet', [ReportController::class,'balanceSheet'])->name('balance_sheet');
+        Route::get('balance-sheet', [ReportController::class, 'balanceSheet'])->name('balance_sheet');
 
-        Route::get('cashflow', [ReportController::class,'cashflow'])->name('cashflow');
-
+        Route::get('cashflow', [ReportController::class, 'cashflow'])->name('cashflow');
     });
-
-    
-
 });

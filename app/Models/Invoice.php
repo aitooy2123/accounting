@@ -38,4 +38,14 @@ class Invoice extends Model
     {
         return $this->total - $this->paid;
     }
-}
+
+    // ลบ Payment ที่เกี่ยวข้องเมื่อ Invoice ถูกลบ
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($invoice) {
+            // ลบ Payment ทั้งหมดที่เชื่อมกับ Invoice
+            $invoice->payments()->delete();
+        });
+    }}

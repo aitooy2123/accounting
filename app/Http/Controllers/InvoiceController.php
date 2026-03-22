@@ -9,16 +9,57 @@ use Carbon\Carbon;
 
 class InvoiceController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = Invoice::latest()->get();
+        $query = Invoice::with('customer');
+
+        // ฟิลเตอร์ชื่อลูกค้า
+        if ($request->filled('customer')) {
+            $query->whereHas('customer', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->customer . '%');
+            });
+        }
+
+        // ฟิลเตอร์ตาม status (0=ค้างชำระ, 1=ชำระครบ, 2=เกินกำหนด)
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // ฟิลเตอร์ตามช่วงวันที่ครบกำหนด
+        if ($request->filled('date_from')) {
+            $query->where('due_date', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->where('due_date', '<=', $request->date_to);
+        }
+
+        $data = $query->orderBy('due_date', 'asc')
+            ->paginate(10)
+            ->withQueryString();
+
         return view('invoice.index', compact('data'));
     }
 
     public function create()
     {
-        $customers = Customer::latest()->get();
-        return view('invoice.create', compact('customers'));
+        // ดึง Invoice ล่าสุด
+        $lastInvoice = \App\Models\Invoice::latest('id')->first();
+
+        if ($lastInvoice) {
+            // แยกตัวเลขจาก INV0000001
+            $number = (int) str_replace('INV', '', $lastInvoice->invoice_no);
+            $newNumber = $number + 1;
+        } else {
+            $newNumber = 1;
+        }
+
+        // ฟอร์แมตรูปแบบ INV + 7 หลัก
+        $invoice_no = 'INV' . str_pad($newNumber, 7, '0', STR_PAD_LEFT);
+
+        // ดึงลูกค้าสำหรับ select
+        $customers = \App\Models\Customer::all();
+
+        return view('invoice.create', compact('invoice_no', 'customers'));
     }
 
 
@@ -134,5 +175,37 @@ class InvoiceController extends Controller
     {
         Invoice::findOrFail($id)->delete();
         return back()->with('success', 'ลบข้อมูลสำเร็จ');
+    }
+
+    public function storePayment(Request $request, Invoice $invoice)
+    {
+        $request->validate([
+            'payment_date' => 'required|date',
+            'amount' => 'required|numeric|min:0.01',
+            'note' => 'nullable|string',
+        ]);
+
+        $invoice->payments()->create([
+            'payment_date' => $request->payment_date,
+            'amount' => $request->amount,
+            'note' => $request->note,
+        ]);
+
+        // อัปเดตยอดชำระและ balance
+        $invoice->paid = $invoice->payments()->sum('amount');
+        $invoice->balance = $invoice->total - $invoice->paid;
+
+        // อัปเดต status อัตโนมัติ
+        if ($invoice->balance <= 0) {
+            $invoice->status = 1; // ชำระครบ
+        } elseif ($invoice->due_date < now()) {
+            $invoice->status = 2; // เกินกำหนด
+        } else {
+            $invoice->status = 0; // ค้างชำระ
+        }
+
+        $invoice->save();
+
+        return redirect()->back()->with('success', 'เพิ่มประวัติการชำระเงินเรียบร้อยแล้ว');
     }
 }

@@ -25,17 +25,14 @@
         <div class="row">
 
           <div class="col-md-6 mb-3">
-
             <label>เลขที่ใบแจ้งหนี้</label>
-
-            <input type="text" name="invoice_no" class="form-control @error('invoice_no') is-invalid @enderror" placeholder="เช่น INV-0001" value="{{ old('invoice_no') }}">
+            <input type="text" name="invoice_no" class="form-control @error('invoice_no') is-invalid @enderror" placeholder="เช่น INV-0000001" value="{{ old('invoice_no', $invoice_no) }}" readonly>
 
             @error('invoice_no')
               <div class="invalid-feedback">
                 {{ $message }}
               </div>
             @enderror
-
           </div>
 
           <div class="col-md-6 mb-3">

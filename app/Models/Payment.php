@@ -13,7 +13,8 @@ class Payment extends Model
     protected $fillable = [
         'invoice_id',
         'amount',
-        'payment_date'
+        'payment_date',
+        'expense_id'
     ];
 
     protected $casts = [

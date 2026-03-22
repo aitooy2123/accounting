@@ -169,6 +169,7 @@
 
         </div>
 
+
         <button class="btn btn-primary mt-3">
           อัปเดตข้อมูล
         </button>
@@ -176,13 +177,133 @@
       </form>
 
     </div>
+
+
+    <h4 class="fw-bold mt-4">🧾 ประวัติการชำระเงิน</h4>
+
+    <div class="glass-card p-4 mt-4">
+
+      <!-- ปุ่มเรียก Modal -->
+      <button class="btn btn-success my-3" data-toggle="modal" data-target="#paymentModal">
+        เพิ่มประวัติการชำระเงิน
+      </button>
+
+      <table class="table table-bordered mb-0">
+
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>วันที่ชำระ</th>
+            <th>จำนวนเงิน</th>
+            <th>หมายเหตุ</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          @php
+            $totalPaid = 0;
+            $no = 1; // เริ่มนับลำดับ
+          @endphp
+
+          @forelse($invoice->payments ?? [] as $payment)
+            @php
+              $totalPaid += $payment->amount;
+            @endphp
+            <tr>
+              <td>{{ $no++ }}</td> {{-- ลำดับ --}}
+              <td>{{ date('d/m/Y', strtotime($payment->payment_date)) }}</td>
+              <td>฿ {{ number_format($payment->amount, 2) }}</td>
+              <td>{{ $payment->note }}</td>
+            </tr>
+          @empty
+            <tr>
+              <td colspan="4" class="text-center">ยังไม่มีประวัติการชำระเงิน</td>
+            </tr>
+          @endforelse
+        </tbody>
+
+        @if ($totalPaid > 0)
+          <tfoot>
+            <tr>
+              <th colspan="2" class="text-end">รวมทั้งหมด</th>
+              <th colspan="2">฿ {{ number_format($totalPaid, 2) }}</th>
+            </tr>
+          </tfoot>
+        @endif
+
+      </table>
+    </div>
+
   </div>
+
+
+
+  <!-- Modal -->
+  <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <form action="{{ route('invoice.payment.store', $invoice->id) }}" method="POST">
+        @csrf
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="paymentModalLabel">เพิ่มประวัติการชำระเงิน</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="ปิด">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+
+            <!-- วันที่ชำระ -->
+            <div class="form-group">
+              <label>วันที่ชำระ</label>
+              <input type="date" name="payment_date" class="form-control @error('payment_date') is-invalid @enderror" value="{{ old('payment_date') }}" placeholder="เลือกวันที่ชำระ" required>
+              @error('payment_date')
+                <div class="invalid-feedback">{{ $message }}</div>
+              @enderror
+            </div>
+
+            <!-- จำนวนเงิน -->
+            <div class="form-group">
+              <label>จำนวนเงิน</label>
+              <input type="number" step="0.01" name="amount" class="form-control @error('amount') is-invalid @enderror" value="{{ old('amount') }}" placeholder="กรอกจำนวนเงินที่ชำระ" required>
+              @error('amount')
+                <div class="invalid-feedback">{{ $message }}</div>
+              @enderror
+            </div>
+
+            <!-- หมายเหตุ -->
+            <div class="form-group">
+              <label>หมายเหตุ</label>
+              <textarea name="note" class="form-control @error('note') is-invalid @enderror" rows="3" placeholder="ใส่หมายเหตุ (ถ้ามี)">{{ old('note') }}</textarea>
+              @error('note')
+                <div class="invalid-feedback">{{ $message }}</div>
+              @enderror
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">ยกเลิก</button>
+            <button type="submit" class="btn btn-success">บันทึก</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/js/bootstrap-datepicker.min.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/locales/bootstrap-datepicker.th.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
     $('#due_date').datepicker({
@@ -309,5 +430,28 @@
       calculate();
     };
   </script>
+  <script>
+    // ป้องกันการกรอกเกินใน modal
+    const paymentInput = document.querySelector('input[name="amount"]');
+    const grandTotal = {{ $invoice->total ?? 0 }}; // หรือยอดคงค้าง
 
+    paymentInput.addEventListener('input', function() {
+      let value = parseFloat(this.value) || 0;
+
+      if (value > grandTotal) {
+        this.value = grandTotal.toFixed(2);
+        alert('จำนวนเงินที่ชำระไม่สามารถเกินยอดรวมของใบแจ้งหนี้ได้');
+      }
+    });
+
+    // ถ้าต้องการ validate ตอน submit form modal
+    const paymentForm = document.querySelector('#paymentModal form');
+    paymentForm.addEventListener('submit', function(e) {
+      let value = parseFloat(paymentInput.value) || 0;
+      if (value > grandTotal) {
+        e.preventDefault();
+        alert('จำนวนเงินที่ชำระไม่สามารถเกินยอดรวมของใบแจ้งหนี้ได้');
+      }
+    });
+  </script>
 @endsection

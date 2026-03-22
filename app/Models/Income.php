@@ -28,4 +28,5 @@ class Income extends Model
     {
         return $this->amount + ($this->amount * 0.07);
     }
+
 }

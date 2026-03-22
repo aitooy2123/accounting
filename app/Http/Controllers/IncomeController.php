@@ -8,9 +8,33 @@ use Illuminate\Http\Request;
 
 class IncomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $data = Income::with('category')->latest()->get();
+        $query = Income::with('category');
+
+        // 🔍 ค้นหาหมวด
+        if ($request->category) {
+            $query->whereHas('category', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->category . '%');
+            });
+        }
+
+        // 📅 ช่วงวันที่
+        if ($request->date_from) {
+            $query->whereDate('date', '>=', $request->date_from);
+        }
+
+        if ($request->date_to) {
+            $query->whereDate('date', '<=', $request->date_to);
+        }
+
+        // 💰 จำนวนเงิน
+        if ($request->amount) {
+            $query->where('amount', $request->amount);
+        }
+
+        $data = $query->latest()->paginate(10)->withQueryString();
+
         return view('income.index', compact('data'));
     }
 

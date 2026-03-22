@@ -99,15 +99,14 @@
           @forelse($payments as $key => $payment)
             @php
               $invoice = $payment->invoice;
-              $total = $invoice->total ?? 0;
+              $total = optional($invoice)->total ?? 0;
 
               $runningPaid = 0;
-              $installment = 0; // 🔥 งวดที่
+              $installment = 0;
 
-              foreach ($invoice->payments as $p) {
+              foreach (optional($invoice)->payments ?? [] as $p) {
                   $runningPaid += $p->amount;
-                  $installment++; // นับงวด
-
+                  $installment++;
                   if ($p->id == $payment->id) {
                       break;
                   }
@@ -115,7 +114,6 @@
 
               $balance = $total - $runningPaid;
             @endphp
-
             <tr>
               <td class="pl-4">
                 <span class="badge badge-light">{{ $key + 1 }}</span>
