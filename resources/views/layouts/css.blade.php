@@ -400,3 +400,16 @@
 
   }
 </style>
+<style>
+.tooltip-inner {
+  background-color: #111;
+  color: #fff;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.bs-tooltip-top .arrow::before {
+  border-top-color: #111 !important;
+}
+</style>

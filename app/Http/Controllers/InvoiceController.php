@@ -26,7 +26,7 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'invoice_no' => 'required',
+            'invoice_no' => 'required|unique:invoices,invoice_no',
             'customer_id' => 'required|exists:customers,id',
             'due_date' => 'required',
             'items' => 'required|array'
@@ -79,7 +79,7 @@ class InvoiceController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'invoice_no' => 'required',
+            'invoice_no' => 'required|unique:invoices,invoice_no,' . $id,
             'customer_id' => 'required|exists:customers,id',
             'due_date' => 'required',
             'items' => 'required|array'
