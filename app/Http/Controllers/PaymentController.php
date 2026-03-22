@@ -9,19 +9,54 @@ use App\Models\JournalItem;
 use App\Models\Account;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
 
 class PaymentController extends Controller
 {
-    public function index()
+
+    public function index(Request $request)
     {
-        $payments = Payment::with([
+        $query = Payment::with([
             'invoice.payments' => fn($q) => $q
                 ->orderBy('payment_date')
                 ->orderBy('id')
-        ])
-            ->orderByDesc('payment_date') // 🔥 ล่าสุดก่อน
-            ->orderByDesc('id')           // กันซ้ำวัน
-            ->paginate(10);
+        ]);
+
+        // 🔍 ค้นหา Invoice
+        if ($request->invoice) {
+            $query->whereHas('invoice', function ($q) use ($request) {
+                $q->where('invoice_no', 'like', '%' . $request->invoice . '%');
+            });
+        }
+
+        // 📅 ช่วงวันที่ (แก้ย้อนหลังได้)
+        if ($request->date_from) {
+            $query->where(
+                'payment_date',
+                '>=',
+                Carbon::parse($request->date_from)->startOfDay()
+            );
+        }
+
+        if ($request->date_to) {
+            $query->where(
+                'payment_date',
+                '<=',
+                Carbon::parse($request->date_to)->endOfDay()
+            );
+        }
+
+        // 💰 จำนวนเงิน
+        if ($request->amount) {
+            $query->where('amount', $request->amount);
+        }
+
+        $payments = $query
+            ->orderByDesc('payment_date')
+            ->orderByDesc('id')
+            ->paginate(10)
+            ->withQueryString(); // 🔥 สำคัญ
 
         $invoices = Invoice::withSum('payments', 'amount')->get();
 

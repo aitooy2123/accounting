@@ -16,7 +16,7 @@
   </div>
 
   {{-- Summary --}}
-  <div class="row mb-4">
+  <div class="row ">
 
     <div class="col-md-6">
       <div class="card-glass p-4 text-white" style="background:linear-gradient(45deg,#10b981,#34d399)">
@@ -43,6 +43,38 @@
 
   </div>
 
+  <form method="GET" class="mb-3">
+    <div class="row">
+
+      <div class="col-md-3">
+        <input type="text" name="invoice" value="{{ request('invoice') }}" class="form-control" placeholder="🔍 Invoice No">
+      </div>
+
+      <div class="col-md-2">
+        <input type="date" name="date_from" id="date_from" value="{{ request('date_from') }}" class="form-control">
+      </div>
+
+      <div class="col-md-2">
+        <input type="date" name="date_to" id="date_to" value="{{ request('date_to') }}" class="form-control" min="{{ request('date_from') ?? date('Y-m-d') }}">
+      </div>
+
+      <div class="col-md-2">
+        <input type="number" name="amount" value="{{ request('amount') }}" class="form-control" placeholder="💰 จำนวนเงิน">
+      </div>
+
+      <div class="col-md-3 d-flex">
+        <button class="btn btn-primary mr-2">
+          🔍 ค้นหา
+        </button>
+
+        <a href="{{ route('payment.index') }}" class="btn btn-secondary">
+          รีเซ็ต
+        </a>
+      </div>
+
+    </div>
+  </form>
+
   <div class="glass-card p-0 shadow-sm">
     <div class="table-responsive">
       <table class="table table-bordered table-modern align-middle mb-0 table-hover">
@@ -51,6 +83,7 @@
           <tr>
             <th class="pl-4">#</th>
             <th>Invoice</th>
+            <th>งวดที่</th>
             <th>ยอดทั้งหมด</th>
             <th>จ่ายงวดนี้</th>
             <th>ยอดสะสม</th>
@@ -68,11 +101,12 @@
               $invoice = $payment->invoice;
               $total = $invoice->total ?? 0;
 
-              // 🔥 Running Balance (ถูกต้อง)
               $runningPaid = 0;
+              $installment = 0; // 🔥 งวดที่
 
               foreach ($invoice->payments as $p) {
                   $runningPaid += $p->amount;
+                  $installment++; // นับงวด
 
                   if ($p->id == $payment->id) {
                       break;
@@ -90,7 +124,11 @@
               <td class="font-weight-bold">
                 {{ $invoice->invoice_no ?? '-' }}
               </td>
-
+              <td>
+                <span class="badge badge-pill badge-primary">
+                  #{{ $installment }}
+                </span>
+              </td>
               <td>
                 ฿ {{ number_format($total, 2) }}
               </td>
@@ -171,13 +209,36 @@
 
 @endsection
 
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+@section('scripts')
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Bootstrap 4 -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Bootstrap 4 -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-  $(document).ready(function() {
-    $('[data-toggle="tooltip"]').tooltip();
-  });
-</script>
+  <script>
+    $(function() {
+      $('[data-toggle="tooltip"]').tooltip();
+    });
+  </script>
+
+  <script>
+    let dateFrom = document.getElementById('date_from');
+    let dateTo = document.getElementById('date_to');
+
+    function updateDateToMin() {
+      if (dateFrom.value) {
+        dateTo.min = dateFrom.value;
+
+        // ถ้า date_to น้อยกว่า date_from → reset
+        if (dateTo.value && dateTo.value < dateFrom.value) {
+          dateTo.value = dateFrom.value;
+        }
+      }
+    }
+
+    dateFrom.addEventListener('change', updateDateToMin);
+
+    // โหลดครั้งแรก
+    window.onload = updateDateToMin;
+  </script>
+@endsection

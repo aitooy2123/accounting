@@ -30,6 +30,7 @@
 
   <!-- Scripts -->
   @include('layouts.js')
+  @yield('scripts')
 
   @if (session('success'))
     <script>
@@ -68,7 +69,7 @@
       });
     </script>
   @endif
-  
+
 </body>
 
 </html>
