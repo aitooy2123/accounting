@@ -26,6 +26,8 @@ class AccountController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
+
         $request->validate([
             'code' => 'required|unique:accounts,code',
             'name' => 'required',

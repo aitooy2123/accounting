@@ -23,65 +23,80 @@ class PaymentController extends Controller
 
     public function create()
     {
-        $invoices = Invoice::where('status','unpaid')->get();
+        $invoices = Invoice::where('status', 'unpaid')->get();
         return view('payment.create', compact('invoices'));
     }
 
-   public function store(Request $request)
-{
-    $request->validate([
-        'invoice_id' => 'required',
-        'amount' => 'required|numeric|min:0',
-        'payment_date' => 'required|date'
-    ]);
-
-    DB::transaction(function() use ($request){
-
-        $payment = Payment::create([
-            'invoice_id' => $request->invoice_id,
-            'amount' => $request->amount,
-            'payment_date' => $request->payment_date
+    public function store(Request $request)
+    {
+        $request->validate([
+            'invoice_id' => 'required|exists:invoices,id',
+            'amount' => 'required|numeric|min:0',
+            'payment_date' => 'required|date'
         ]);
 
-        $invoice = Invoice::find($request->invoice_id);
+        DB::transaction(function () use ($request) {
 
-        if($request->amount >= $invoice->total){
-            $invoice->update(['status'=>'paid']);
-        }
+            $invoice = Invoice::findOrFail($request->invoice_id);
 
-        $entry = JournalEntry::create([
-            'date' => $request->payment_date,
-            'reference' => 'PAY-'.$payment->id,
-            'description' => 'รับชำระเงิน'
-        ]);
+            // สร้าง Payment
+            $payment = Payment::create([
+                'invoice_id' => $invoice->id,
+                'amount' => $request->amount,
+                'payment_date' => $request->payment_date
+            ]);
 
-        // เดบิต เงินสด
-        JournalItem::create([
-            'journal_entry_id' => $entry->id,
-            'account_id' => Account::where('code','1000')->first()->id,
-            'debit' => $request->amount,
-            'credit' => 0
-        ]);
+            // ✅ คำนวณยอดที่จ่ายทั้งหมด (รองรับ partial payment)
+            $totalPaid = Payment::where('invoice_id', $invoice->id)->sum('amount');
 
-        // เครดิต ลูกหนี้
-        JournalItem::create([
-            'journal_entry_id' => $entry->id,
-            'account_id' => Account::where('code','1100')->first()->id,
-            'debit' => 0,
-            'credit' => $request->amount
-        ]);
+            // ✅ update status (0 = pending, 1 = paid)
+            if ($totalPaid >= $invoice->total) {
+                $invoice->update(['status' => 1]);
+            }
 
-    });
+            // สร้าง Journal Entry
+            $entry = JournalEntry::create([
+                'date' => $request->payment_date,
+                'reference' => 'PAY-' . $payment->id,
+                'description' => 'รับชำระเงิน'
+            ]);
 
-    return redirect()->route('payment.index')
-        ->with('success','บันทึกการรับเงินสำเร็จ');
-}
+            // หา account ครั้งเดียว (ลด query ซ้ำ)
+            $cashAccount = Account::where('code', '1000')->firstOrFail();
+            $arAccount   = Account::where('code', '1100')->firstOrFail();
+
+            // เดบิต เงินสด
+            JournalItem::create([
+                'journal_entry_id' => $entry->id,
+                'account_id' => $cashAccount->id,
+                'debit' => $request->amount,
+                'credit' => 0
+            ]);
+
+            // เครดิต ลูกหนี้
+            JournalItem::create([
+                'journal_entry_id' => $entry->id,
+                'account_id' => $arAccount->id,
+                'debit' => 0,
+                'credit' => $request->amount
+            ]);
+        });
+
+        return redirect()->route('payment.index')
+            ->with('success', 'บันทึกการรับเงินสำเร็จ');
+    }
 
     public function destroy(Payment $payment)
     {
+        $invoice = $payment->invoice;
+
         $payment->delete();
 
+        if ($invoice) {
+            $invoice->update(['status' => 0]);
+        }
+
         return redirect()->route('payment.index')
-            ->with('success','ลบรายการสำเร็จ');
+            ->with('success', 'ลบรายการสำเร็จ');
     }
 }

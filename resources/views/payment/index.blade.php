@@ -65,7 +65,7 @@
                 {{ \Carbon\Carbon::parse($payment->payment_date)->format('d/m/Y') }}
               </td>
 
-              <td class="align-middle text-center pr-4">
+              <td class="align-middle text-center pr-4 text-nowrap">
 
                 <a href="{{ route('payment.edit', $payment->id) }}" class="btn btn-sm btn-warning mr-1">
                   แก้ไข
